@@ -10,12 +10,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const profileEmail = document.getElementById('profileEmail');
     const profileNameInput = document.getElementById('nomePerfil');
     const profileEmailInput = document.getElementById('emailPerfil');
+    const notificationButton = document.getElementById('notificationButton');
+    const notificationPanel = document.getElementById('notificationPanel');
+    const notificationList = document.getElementById('notificationList');
+    const notificationBadge = document.getElementById('notificationBadge');
 
     if (userGreeting) userGreeting.textContent = `Olá, ${userName}!`;
     if (profileName) profileName.textContent = userName;
     if (profileEmail) profileEmail.textContent = userEmail;
     if (profileNameInput) profileNameInput.value = userName;
     if (profileEmailInput) profileEmailInput.value = userEmail;
+
+    function getPendingTasks() {
+        return Array.from(document.querySelectorAll('.task-list-scroll .task-item')).map((item) => {
+            const checkbox = item.querySelector('.custom-checkbox');
+            const title = item.querySelector('.task-title')?.textContent.trim() || 'Tarefa sem título';
+            const priority = item.querySelector('.badge')?.textContent.trim() || 'Sem prioridade';
+            const time = item.querySelector('.task-time')?.textContent.replace(/\s+/g, ' ').trim() || 'Sem horário';
+            const isCompleted = checkbox ? checkbox.checked : false;
+
+            return {
+                title,
+                priority,
+                time,
+                isCompleted,
+            };
+        }).filter((task) => !task.isCompleted);
+    }
+
+    function renderNotifications() {
+        if (!notificationList || !notificationBadge) return;
+
+        const pendingTasks = getPendingTasks();
+        notificationBadge.textContent = pendingTasks.length;
+
+        if (!pendingTasks.length) {
+            notificationList.innerHTML = '<li class="notification-empty">Nenhum lembrete pendente no momento.</li>';
+            return;
+        }
+
+        notificationList.innerHTML = pendingTasks.map((task) => `
+            <li class="notification-item">
+                <strong>${task.title}</strong>
+                <span>${task.time} • ${task.priority}</span>
+            </li>
+        `).join('');
+
+        if ('Notification' in window && Notification.permission === 'granted') {
+            const firstTask = pendingTasks[0];
+            new Notification('Lembrete de tarefa', {
+                body: `${firstTask.title} • ${firstTask.time}`,
+            });
+        }
+    }
+
+    if (notificationButton && notificationPanel) {
+        notificationButton.addEventListener('click', () => {
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            const isHidden = notificationPanel.hasAttribute('hidden');
+            notificationPanel.toggleAttribute('hidden', !isHidden);
+            renderNotifications();
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!notificationButton.contains(event.target) && !notificationPanel.contains(event.target)) {
+                notificationPanel.setAttribute('hidden', 'hidden');
+            }
+        });
+    }
 
     // 1. Alternância de visibilidade da senha (Login e Cadastro)
     const togglePasswordButtons = document.querySelectorAll('.btn-toggle-password');
@@ -48,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
         statConcluidas.textContent = totalChecked;
         statPendentes.textContent = totalTasks - totalChecked;
         statAlta.textContent = highPriorityTasks;
+        renderNotifications();
     }
 
     checkboxes.forEach(checkbox => {
@@ -67,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.btn-action[title="Editar"]').forEach(button => {
         button.addEventListener('click', () => {
-            window.location.href = 'editar-tarefa.html';
+            window.location.href = 'pages/editar-tarefa.html';
         });
     });
 
@@ -114,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (formLogin) {
         formLogin.addEventListener('submit', (e) => {
             e.preventDefault();
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         });
     }
 
@@ -147,7 +213,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             const titulo = document.getElementById('tituloTarefa')?.value;
             alert(`Tarefa "${titulo}" salva com sucesso!`);
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         });
     }
 
@@ -159,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
         formEditarTarefa.addEventListener('submit', (e) => {
             e.preventDefault();
             alert('Tarefa atualizada com sucesso!');
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         });
     }
 
@@ -167,9 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         deleteTaskButton.addEventListener('click', () => {
             if (!window.confirm('Deseja excluir esta tarefa?')) return;
             alert('Tarefa excluída com sucesso!');
-            window.location.href = 'index.html';
+            window.location.href = '../index.html';
         });
     }
 });
-
-

@@ -24,16 +24,16 @@
                     <span class="nav-icon"><img src="img/icon-home.svg" alt=""></span>
                     Hoje
                 </li>
-                <li class="nav-item" onclick="window.location.href='historico.html'">
+                <li class="nav-item" onclick="window.location.href='pages/historico.html'">
                     <span class="nav-icon"><img src="img/icon-history.svg" alt=""></span>
                     Histórico
                 </li>
-                <li class="nav-item" onclick="window.location.href='perfil.html'">
+                <li class="nav-item" onclick="window.location.href='pages/perfil.html'">
                     <span class="nav-icon"><img src="img/icon-user.svg" alt=""></span>
                     Perfil
                 </li>
             </ul>
-            <div class="nav-item nav-logout" onclick="window.location.href='login.html'">
+            <div class="nav-item nav-logout" onclick="window.location.href='pages/login.html'">
                 <span class="nav-icon"><img src="img/icon-logout.svg" alt=""></span>
                 Sair
             </div>
@@ -43,10 +43,24 @@
         <main class="main-content">
             <div class="header-top">
                 <h2 id="userGreeting">Olá!</h2>
-                <a href="nova-tarefa.html" class="btn-add">
-                    <img src="img/icon-plus.svg" alt="">
-                    Nova Tarefa
-                </a>
+                <div class="header-actions">
+                    <button class="notification-button" id="notificationButton" type="button" aria-label="Notificações">
+                        <img src="img/icon-bell.svg" alt="Notificações">
+                        <span class="notification-badge" id="notificationBadge">0</span>
+                    </button>
+                    <a href="pages/nova-tarefa.html" class="btn-add">
+                        <img src="img/icon-plus.svg" alt="">
+                        Nova Tarefa
+                    </a>
+                </div>
+            </div>
+
+            <div class="notification-panel" id="notificationPanel" hidden>
+                <div class="notification-header">
+                    <strong>Lembretes</strong>
+                    <span>Hoje</span>
+                </div>
+                <ul id="notificationList" class="notification-list"></ul>
             </div>
 
             <!-- Stats Cards -->
@@ -187,4 +201,3 @@
     <script src="js/app.js"></script>
 </body>
 </html>
-
