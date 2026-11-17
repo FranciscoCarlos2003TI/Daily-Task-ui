@@ -1,0 +1,64 @@
+{
+  "info": { "name": "Daily Task API", "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json" },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000/api" },
+    { "key": "idToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "taskId", "value": "" }
+  ],
+  "auth": { "type": "bearer", "bearer": [{ "key": "token", "value": "{{idToken}}", "type": "string" }] },
+  "item": [
+    { "name": "Health", "request": { "auth": { "type": "noauth" }, "method": "GET", "url": "{{baseUrl}}/health" } },
+    { "name": "Auth", "item": [
+      { "name": "Register", "request": { "auth": { "type": "noauth" }, "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Carlos Teste\",\n  \"email\": \"carlos@teste.com\",\n  \"senha\": \"123456\"\n}" },
+        "url": "{{baseUrl}}/auth/register" },
+        "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const j = pm.response.json();", "if (j.idToken) { pm.collectionVariables.set('idToken', j.idToken); pm.collectionVariables.set('refreshToken', j.refreshToken); }"] } }] },
+      { "name": "Login", "request": { "auth": { "type": "noauth" }, "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"carlos@teste.com\",\n  \"senha\": \"123456\"\n}" },
+        "url": "{{baseUrl}}/auth/login" },
+        "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const j = pm.response.json();", "if (j.idToken) { pm.collectionVariables.set('idToken', j.idToken); pm.collectionVariables.set('refreshToken', j.refreshToken); }"] } }] },
+      { "name": "Refresh token", "request": { "auth": { "type": "noauth" }, "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+        "url": "{{baseUrl}}/auth/refresh" },
+        "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const j = pm.response.json();", "if (j.idToken) { pm.collectionVariables.set('idToken', j.idToken); pm.collectionVariables.set('refreshToken', j.refreshToken); }"] } }] },
+      { "name": "Forgot password", "request": { "auth": { "type": "noauth" }, "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"email\": \"carlos@teste.com\"\n}" },
+        "url": "{{baseUrl}}/auth/forgot-password" } }
+    ]},
+    { "name": "Users", "item": [
+      { "name": "Meu perfil", "request": { "method": "GET", "url": "{{baseUrl}}/users/me" } },
+      { "name": "Atualizar perfil", "request": { "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"nome\": \"Carlos Atualizado\"\n}" },
+        "url": "{{baseUrl}}/users/me" } },
+      { "name": "Excluir conta", "request": { "method": "DELETE", "url": "{{baseUrl}}/users/me" } }
+    ]},
+    { "name": "Tasks", "item": [
+      { "name": "Criar tarefa", "request": { "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"titulo\": \"Comprar leite e café\",\n  \"descricao\": \"Mercado\",\n  \"hora\": \"18:30\",\n  \"prioridade\": \"alta\",\n  \"lembrete\": true\n}" },
+        "url": "{{baseUrl}}/tasks" },
+        "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["const j = pm.response.json();", "if (j.tarefa) pm.collectionVariables.set('taskId', j.tarefa.id);"] } }] },
+      { "name": "Listar todas", "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/tasks?prioridade=alta", "host": ["{{baseUrl}}"], "path": ["tasks"], "query": [{ "key": "prioridade", "value": "alta" }] } } },
+      { "name": "Tarefas de hoje (+stats)", "request": { "method": "GET", "url": "{{baseUrl}}/tasks/hoje" } },
+      { "name": "Histórico", "request": { "method": "GET", "url": "{{baseUrl}}/tasks/historico" } },
+      { "name": "Stats", "request": { "method": "GET", "url": "{{baseUrl}}/tasks/stats" } },
+      { "name": "Notificações", "request": { "method": "GET", "url": "{{baseUrl}}/tasks/notificacoes" } },
+      { "name": "Buscar por id", "request": { "method": "GET", "url": "{{baseUrl}}/tasks/{{taskId}}" } },
+      { "name": "Atualizar", "request": { "method": "PUT",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"titulo\": \"Comprar pão\",\n  \"prioridade\": \"media\",\n  \"data\": \"2026-11-20\"\n}" },
+        "url": "{{baseUrl}}/tasks/{{taskId}}" } },
+      { "name": "Concluir", "request": { "method": "PATCH",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": { "mode": "raw", "raw": "{\n  \"concluida\": true\n}" },
+        "url": "{{baseUrl}}/tasks/{{taskId}}/concluir" } },
+      { "name": "Excluir", "request": { "method": "DELETE", "url": "{{baseUrl}}/tasks/{{taskId}}" } }
+    ]}
+  ]
+}
